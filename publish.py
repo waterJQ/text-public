@@ -39,7 +39,7 @@ def publish(content, output, updated=None, available=True):
         "writing-assistant.md": content,
         "writing-assistant.txt": content,
         "README.md": f"# 文字內容公開閱讀\n\n[閱讀網頁]({PUBLIC}) · [AI 純文字網址]({RAW})\n\n發布時間 {stamp}\n\n---\n\n" + content,
-        "publication.json": json.dumps({"sha256": digest, "publishedAt": stamp, "source": SOURCE, "available": available}, ensure_ascii=False, indent=2) + "\n",
+        "publication.json": json.dumps({"sha256": digest, "publishedAt": stamp, "verifiedOn": datetime.now(timezone(timedelta(hours=8))).strftime("%Y/%m/%d"), "source": SOURCE, "available": available}, ensure_ascii=False, indent=2) + "\n",
         "robots.txt": f"User-agent: *\nAllow: /\n\nUser-agent: GPTBot\nDisallow: /\n\nSitemap: {PUBLIC}sitemap.xml\n",
         "sitemap.xml": f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{PUBLIC}</loc></url></urlset>',
         ".nojekyll": "",
