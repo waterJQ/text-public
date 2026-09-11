@@ -2,7 +2,7 @@
 
 [閱讀網頁](https://waterjq.github.io/text-public/) · [AI 純文字網址](https://raw.githubusercontent.com/waterJQ/text-public/main/writing-assistant.md)
 
-發布时间 2026/09/11 22:09
+發布時間 2026/09/11 22:09
 
 ---
 

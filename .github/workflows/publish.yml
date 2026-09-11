@@ -21,6 +21,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: 驗證發布程式
+        run: python3 -m unittest test_publish.py
       - name: 取得已公開內容
         run: python3 publish.py
       - name: 記錄內容更新

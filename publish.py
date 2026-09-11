@@ -5,6 +5,7 @@ import json
 import re
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 SOURCE = "https://text-public.water5726water5726.workers.dev/writing-assistant.txt"
@@ -13,7 +14,7 @@ RAW = "https://raw.githubusercontent.com/waterJQ/text-public/main/writing-assist
 MAX_BYTES = 2 * 1024 * 1024
 
 
-def publish(content, output, updated=None):
+def publish(content, output, updated=None, available=True):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=True)
     digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
@@ -37,8 +38,8 @@ def publish(content, output, updated=None):
         "index.html": doc,
         "writing-assistant.md": content,
         "writing-assistant.txt": content,
-        "README.md": f"# 文字內容公開閱讀\n\n[閱讀網頁]({PUBLIC}) · [AI 純文字網址]({RAW})\n\n發布时间 {stamp}\n\n---\n\n" + content,
-        "publication.json": json.dumps({"sha256": digest, "publishedAt": stamp, "source": SOURCE}, ensure_ascii=False, indent=2) + "\n",
+        "README.md": f"# 文字內容公開閱讀\n\n[閱讀網頁]({PUBLIC}) · [AI 純文字網址]({RAW})\n\n發布時間 {stamp}\n\n---\n\n" + content,
+        "publication.json": json.dumps({"sha256": digest, "publishedAt": stamp, "source": SOURCE, "available": available}, ensure_ascii=False, indent=2) + "\n",
         "robots.txt": f"User-agent: *\nAllow: /\n\nUser-agent: GPTBot\nDisallow: /\n\nSitemap: {PUBLIC}sitemap.xml\n",
         "sitemap.xml": f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>{PUBLIC}</loc></url></urlset>',
         ".nojekyll": "",
@@ -49,13 +50,22 @@ def publish(content, output, updated=None):
     return digest
 
 
-if __name__ == "__main__":
+def fetch_source():
     request = Request(SOURCE, headers={"User-Agent": "text-public-publisher/1.0"})
-    with urlopen(request, timeout=30) as response:
-        if response.status != 200 or response.headers.get_content_type() != "text/plain":
-            raise RuntimeError("Public source must return plain text and status 200")
-        data = response.read(MAX_BYTES + 1)
+    try:
+        with urlopen(request, timeout=30) as response:
+            if response.status != 200 or response.headers.get_content_type() != "text/plain":
+                raise RuntimeError("Public source must return plain text and status 200")
+            data = response.read(MAX_BYTES + 1)
+    except HTTPError as error:
+        if error.code in (404, 503) and error.headers.get("X-Public-Availability") == "withdrawn":
+            return "# 內容已停止公開\n\n這份內容目前未開放閱讀。\n", False
+        raise
     if not data or len(data) > MAX_BYTES:
         raise RuntimeError("Public source is empty or exceeds the size limit")
-    content = data.decode("utf-8")
-    print(publish(content, Path(__file__).parent))
+    return data.decode("utf-8"), True
+
+
+if __name__ == "__main__":
+    content, available = fetch_source()
+    print(publish(content, Path(__file__).parent, available=available))
