@@ -6,7 +6,7 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock
 from urllib.error import HTTPError
 
-from publish import publish, fetch_source, SOURCE, MAX_BYTES
+from publish import publish, fetch_source, synchronize, SOURCE, MAX_BYTES
 
 
 class PublicationTests(unittest.TestCase):
@@ -25,6 +25,34 @@ class PublicationTests(unittest.TestCase):
             self.assertEqual((root / "publication.json").read_bytes(), before)
             publish("# 更新後\n新內容", folder, "2026/09/12 10:00")
             self.assertEqual(json.loads((root / "publication.json").read_text("utf-8"))["publishedAt"], "2026/09/12 10:00")
+
+    def test_documents_are_independent_and_plain(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            publish("writing", root)
+            before = (root / "publication.json").read_bytes()
+            publish("UI <script>bad()</script>", root, slug="ui-guidelines")
+            self.assertEqual((root / "writing-assistant.md").read_text("utf-8"), "writing")
+            self.assertEqual((root / "publication.json").read_bytes(), before)
+            self.assertEqual((root / "ui-guidelines.md").read_text("utf-8"), "UI <script>bad()</script>")
+            for name in ["index.html", "ui-guidelines.html"]:
+                page = (root / name).read_text("utf-8")
+                self.assertNotIn("<nav", page)
+                self.assertNotIn("<header", page)
+                self.assertNotIn("<script>", page)
+            self.assertIn("ui-guidelines.txt", json.loads((root / "ui-guidelines.publication.json").read_text("utf-8"))["source"])
+
+    def test_transient_failure_does_not_prevent_other_withdrawal(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            publish("writing", root)
+            publish("old UI", root, slug="ui-guidelines")
+            with patch("publish.fetch_source", side_effect=[RuntimeError("temporary"), ("withdrawn", False)]):
+                with self.assertRaises(RuntimeError):
+                    synchronize(root)
+            self.assertEqual((root / "writing-assistant.md").read_text("utf-8"), "writing")
+            self.assertEqual((root / "ui-guidelines.md").read_text("utf-8"), "withdrawn")
+            self.assertFalse(json.loads((root / "ui-guidelines.publication.json").read_text("utf-8"))["available"])
 
     def test_explicit_withdrawal_replaces_live_content(self):
         headers = Message()
