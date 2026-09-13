@@ -37,8 +37,8 @@ def publish(content, output, updated=None, available=True, slug="writing-assista
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{safe_title}</title><meta name="description" content="{safe_title}完整公開內容">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
-<link rel="canonical" href="{public_url}"><link rel="alternate" type="text/plain" href="{slug}.txt">
-<link rel="stylesheet" href="reader.css"><link rel="icon" href="favicon.svg" type="image/svg+xml"></head>
+<link rel="canonical" href="{public_url}"><link rel="alternate" type="text/plain" href="/{slug}.txt">
+<link rel="stylesheet" href="/reader.css"><link rel="icon" href="/favicon.svg" type="image/svg+xml"></head>
 <body><main><pre>{safe_content}</pre></main></body></html>'''
     files = {
         page_name: doc,
@@ -53,7 +53,9 @@ def publish(content, output, updated=None, available=True, slug="writing-assista
     }
     if not primary:
         del files["README.md"]
+    files[slug + "/index.html"] = doc
     for name, value in files.items():
+        (output / name).parent.mkdir(parents=True, exist_ok=True)
         (output / name).write_text(value, encoding="utf-8", newline="\n")
     return digest
 
