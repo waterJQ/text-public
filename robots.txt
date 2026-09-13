@@ -1,13 +1,7 @@
 User-agent: *
 Allow: /
 
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
 User-agent: GPTBot
 Disallow: /
 
-Sitemap: https://text-public.jc5726.com/sitemap.xml
+Sitemap: https://waterjq.github.io/text-public/sitemap.xml

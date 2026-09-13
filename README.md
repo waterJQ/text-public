@@ -1,14 +1,6 @@
-# 公開閱讀目錄
+# 文字內容公開閱讀
 
-[網站目錄](https://text-public.jc5726.com/contents.html)
-
-| 內容 | 網頁 | AI 文字 |
-|---|---|---|
-| 文字內容優化助手 | [閱讀](https://text-public.jc5726.com/writing-assistant/) | [純文字](https://text-public.jc5726.com/writing-assistant.txt) |
-| 介面視覺規則 | [閱讀](https://text-public.jc5726.com/ui-guidelines/) | [純文字](https://text-public.jc5726.com/ui-guidelines.txt) |
-| CAE 新聞統整 | [閱讀](https://text-public.jc5726.com/cae-news-digest/) | [純文字](https://text-public.jc5726.com/cae-news-digest.txt) |
-| 全台藝文活動搜尋 | [閱讀](https://text-public.jc5726.com/taiwan-arts-event-search/) | [純文字](https://text-public.jc5726.com/taiwan-arts-event-search.txt) |
-| 宜蘭近期活動 | [閱讀](https://text-public.jc5726.com/yilan-upcoming-events/) | [純文字](https://text-public.jc5726.com/yilan-upcoming-events.txt) |
+[閱讀網頁](https://waterjq.github.io/text-public/) · [AI 純文字網址](https://raw.githubusercontent.com/waterJQ/text-public/main/writing-assistant.md)
 
 發布時間 2026/09/11 22:09
 

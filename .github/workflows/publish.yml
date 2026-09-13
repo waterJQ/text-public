@@ -32,7 +32,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add cae-news-digest taiwan-arts-event-search yilan-upcoming-events *.html *.md *.txt *.json writing-assistant/index.html ui-guidelines/index.html ui-guidelines.html ui-guidelines.md ui-guidelines.txt ui-guidelines.publication.json index.html writing-assistant.md writing-assistant.txt README.md publication.json robots.txt sitemap.xml .nojekyll favicon.svg
+          git add ui-guidelines.html ui-guidelines.md ui-guidelines.txt ui-guidelines.publication.json index.html writing-assistant.md writing-assistant.txt README.md publication.json robots.txt sitemap.xml .nojekyll favicon.svg
           if ! git diff --cached --quiet; then
             git commit -m '確認公開內容與來源同步'
             git push
@@ -44,10 +44,7 @@ jobs:
         if: steps.sync.outputs.changed == 'true' || github.event_name != 'schedule'
         run: |
           mkdir -p _site
-          cp indexnow-key.txt _site/
-          cp -r writing-assistant ui-guidelines cae-news-digest taiwan-arts-event-search yilan-upcoming-events _site/
-          cp cae-news-digest.txt taiwan-arts-event-search.txt yilan-upcoming-events.txt cae-news-digest.md taiwan-arts-event-search.md yilan-upcoming-events.md cae-news-digest.html taiwan-arts-event-search.html yilan-upcoming-events.html contents.html *.publication.json _site/
-          cp ui-guidelines.html ui-guidelines.txt ui-guidelines.publication.json index.html reader.css writing-assistant.txt favicon.svg robots.txt sitemap.xml publication.json .nojekyll writing-assistant.md ui-guidelines.md _site/
+          cp ui-guidelines.html ui-guidelines.txt ui-guidelines.publication.json index.html reader.css writing-assistant.txt favicon.svg robots.txt sitemap.xml publication.json .nojekyll _site/
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
         if: steps.sync.outputs.changed == 'true' || github.event_name != 'schedule'
         with:
@@ -55,10 +52,6 @@ jobs:
       - uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e
         if: steps.sync.outputs.changed == 'true' || github.event_name != 'schedule'
         id: deployment
-      - name: 通知公開網址更新
-        if: github.repository == 'waterJQ/text-public-domain' && steps.deployment.outcome == 'success'
-        continue-on-error: true
-        run: python3 notify_index.py
       - name: 回報來源讀取失敗
         if: steps.fetch.outcome == 'failure'
         run: exit 1
