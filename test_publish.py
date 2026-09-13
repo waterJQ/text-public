@@ -10,6 +10,21 @@ from publish import publish, fetch_source, synchronize, SOURCE, MAX_BYTES
 
 
 class PublicationTests(unittest.TestCase):
+    def test_new_documents_have_independent_aliases_and_withdrawal(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for slug in ("cae-news-digest", "taiwan-arts-event-search", "yilan-upcoming-events"):
+                content = "# " + slug + "\n完整正文"
+                publish(content, root, slug=slug)
+                self.assertEqual((root / (slug + ".txt")).read_text("utf-8"), content)
+                page = (root / slug / "index.html").read_text("utf-8")
+                self.assertIn("https://text-public.jc5726.com/" + slug, page)
+                self.assertIn('href="../reader.css"', page)
+                self.assertIn("發布時間", page)
+                publish("內容已停止公開", root, slug=slug, available=False)
+                for name in (slug + ".html", slug + "/index.html", slug + ".txt", slug + ".md"):
+                    self.assertNotIn("完整正文", (root / name).read_text("utf-8"))
+
     def test_text_integrity_and_html_escaping(self):
         content = '# 標題 <script>alert(1)</script>\n內容 & "引號"\n'
         with tempfile.TemporaryDirectory() as folder:
